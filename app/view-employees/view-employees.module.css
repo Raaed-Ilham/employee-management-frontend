@@ -1,50 +1,58 @@
 .container {
     padding: 2rem;
-    background-color: #f4f6f8;
+    background-color: #f0f2f5;
     min-height: 100vh;
     font-family: "Segoe UI", sans-serif;
-    color: #333;
+    color: #2c3e50;
 }
 
 .heading {
     text-align: center;
-    font-size: 2rem;
+    font-size: 2.2rem;
+    font-weight: 600;
     margin-bottom: 2rem;
-    color: #222;
+    color: #34495e;
 }
 
 .filters {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
 .select {
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1rem;
     font-size: 1rem;
     border-radius: 8px;
     border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
+    background-color: #ffffff;
+    color: #333;
+    transition: border-color 0.3s;
+}
+
+.select:focus {
+    border-color: #2980b9;
+    outline: none;
 }
 
 .tableWrapper {
     overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    background-color: white;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background-color: white;
+    background-color: #ffffff;
 }
 
 .table thead {
-    background-color: #0070f3;
-    color: white;
+    background-color: #2d3e50;
+    color: #ecf0f1;
 }
 
 .table th,
@@ -52,29 +60,31 @@
     padding: 1rem;
     text-align: left;
     font-size: 0.95rem;
+    border-bottom: 1px solid #ecf0f1;
 }
 
 .table tr:nth-child(even) {
-    background-color: #f0f4f8;
+    background-color: #f9fbfc;
 }
 
 .table tr:hover {
-    background-color: #e6f0ff;
+    background-color: #eaf3fb;
 }
 
 .active {
-    color: green;
+    color: #27ae60;
     font-weight: 600;
 }
 
 .inactive {
-    color: red;
+    color: #c0392b;
     font-weight: 600;
 }
 
 .emptyText {
     text-align: center;
-    color: #666;
+    color: #888;
     font-style: italic;
     padding: 2rem;
+    font-size: 1rem;
 }

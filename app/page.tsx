@@ -10,7 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  //post req to login handler controlled by spring boot
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -22,12 +22,12 @@ export default function Login() {
       const token = response.data;
       localStorage.setItem("token", token);
 
-      // Decode JWT to extract role
+      // get the role and direct user to relevant page based on role
       const payload = JSON.parse(atob(token.split(".")[1]));
       const role = payload.role;
 
       if (role === "admin") {
-        router.push("/dashboard"); // your EMS main page
+        router.push("/dashboard"); //  EMS main managment page
       } else {
         router.push("/task"); // employee daily task page
       }
