@@ -17,6 +17,15 @@ interface Task {
 export default function ViewTasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
+    const [showForm, setShowForm] = useState(false);
+
+    // Form state
+    const [newTask, setNewTask] = useState({
+        task_name: '',
+        description: '',
+        assigned_employee_id: '',
+        progress: 'new',
+    });
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -29,15 +38,44 @@ export default function ViewTasks() {
         };
 
         fetchTasks();
+        const intervalId = setInterval(fetchTasks, 5000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const toggleExpand = (taskId: number) => {
         setExpandedTaskId(prev => (prev === taskId ? null : taskId));
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setNewTask(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await axios.post("http://localhost:8080/tasks", {
+                ...newTask,
+                assigned_employee_id: Number(newTask.assigned_employee_id),
+            });
+            setShowForm(false);
+            setNewTask({
+                task_name: '',
+                description: '',
+                assigned_employee_id: '',
+                progress: 'new',
+            });
+        } catch (error) {
+            console.error("Error creating task:", error);
+        }
+    };
+
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${showForm ? styles.blurred : ''}`}>
             <h1 className={styles.heading}>Project Tasks</h1>
+
+            <button className={styles.createButton} onClick={() => setShowForm(true)}>+ Create Task</button>
+
             <div className={styles.taskList}>
                 {tasks.length === 0 ? (
                     <p className={styles.emptyText}>No tasks available.</p>
@@ -63,6 +101,52 @@ export default function ViewTasks() {
                     ))
                 )}
             </div>
+
+            {showForm && (
+                <div className={styles.modalOverlay}>
+                    <form className={styles.modalForm} onSubmit={handleFormSubmit}>
+                        <h2>Create New Task</h2>
+                        <input
+                            type="text"
+                            name="task_name"
+                            placeholder="Task Name"
+                            value={newTask.task_name}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <textarea
+                            name="description"
+                            placeholder="Description"
+                            value={newTask.description}
+                            onChange={handleInputChange}
+                            rows={3}
+                        />
+                        <input
+                            type="number"
+                            name="assigned_employee_id"
+                            placeholder="Assigned Employee ID"
+                            value={newTask.assigned_employee_id}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <select
+                            name="progress"
+                            value={newTask.progress}
+                            onChange={handleInputChange}
+                        >
+                            <option value="new">New</option>
+                            <option value="started">Started</option>
+                            <option value="in progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <div className={styles.modalActions}>
+                            <button type="submit">Submit</button>
+                            <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            )}
         </div>
     );
 }
