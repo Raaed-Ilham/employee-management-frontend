@@ -14,12 +14,21 @@ interface Task {
     progress: ProgressStatus;
 }
 
+// create interface/object of type task and employee to hold db objects 
+
+interface Employee {
+    id: number;
+    name: string;
+}
+
+//create use states for updating and holding task and employee components
+
 export default function ViewTasks() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [employees, setEmployees] = useState<Employee[]>([]);
     const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
     const [showForm, setShowForm] = useState(false);
 
-    // Form state
     const [newTask, setNewTask] = useState({
         task_name: '',
         description: '',
@@ -27,17 +36,34 @@ export default function ViewTasks() {
         progress: 'new',
     });
 
+    //useEffect returns clearInt which reruns setInt func with fetchtasks function running every 5 secs
     useEffect(() => {
+        // function run every 5 secs to get task data from db
+
         const fetchTasks = async () => {
             try {
                 const response = await axios.get("http://localhost:8080/tasks");
+                //setTasks method called to rerender display with new data for all tasks
                 setTasks(response.data);
             } catch (error) {
                 console.error("Error fetching tasks:", error);
             }
         };
 
+        const fetchEmployees = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/employees");
+                //same as above
+                setEmployees(response.data);
+            } catch (error) {
+                console.error("Error fetching employees:", error);
+            }
+        };
+
+        // run once at the start
         fetchTasks();
+        fetchEmployees();
+
         const intervalId = setInterval(fetchTasks, 5000);
         return () => clearInterval(intervalId);
     }, []);
@@ -50,15 +76,20 @@ export default function ViewTasks() {
         const { name, value } = e.target;
         setNewTask(prev => ({ ...prev, [name]: value }));
     };
-
+ 
+    //run async form event on submit form
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+
+            //post method to send values of newTaskobject and assignedempId to db
             await axios.post("http://localhost:8080/tasks", {
                 ...newTask,
                 assigned_employee_id: Number(newTask.assigned_employee_id),
             });
             setShowForm(false);
+            //setNewTask function called to update NewTask vals
+            
             setNewTask({
                 task_name: '',
                 description: '',
@@ -70,6 +101,7 @@ export default function ViewTasks() {
         }
     };
 
+    // form layout and html written below
     return (
         <div className={`${styles.container} ${showForm ? styles.blurred : ''}`}>
             <h1 className={styles.heading}>Project Tasks</h1>
@@ -102,6 +134,7 @@ export default function ViewTasks() {
                 )}
             </div>
 
+            
             {showForm && (
                 <div className={styles.modalOverlay}>
                     <form className={styles.modalForm} onSubmit={handleFormSubmit}>
@@ -121,14 +154,19 @@ export default function ViewTasks() {
                             onChange={handleInputChange}
                             rows={3}
                         />
-                        <input
-                            type="number"
+                        <select
                             name="assigned_employee_id"
-                            placeholder="Assigned Employee ID"
                             value={newTask.assigned_employee_id}
                             onChange={handleInputChange}
                             required
-                        />
+                        >
+                            <option value="">Select Employee</option>
+                            {employees.map(emp => (
+                                <option key={emp.id} value={emp.id}>
+                                    {emp.name} (ID: {emp.id})
+                                </option>
+                            ))}
+                        </select>
                         <select
                             name="progress"
                             value={newTask.progress}

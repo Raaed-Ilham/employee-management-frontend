@@ -12,13 +12,12 @@ export default function task() {
         if (!token) {
             router.push("/login");
         }
-        // You could optionally decode and verify token here too
     }, []);
 
     return (
         <div>
             <h1>Welcome to the taskboard</h1>
-            {/* Add actual EMS content here */}
+
         </div>
     );
 }
